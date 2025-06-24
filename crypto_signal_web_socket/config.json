@@ -1,0 +1,42 @@
+{
+    "SYMBOLS": [
+        "btc_usdt",
+        "eth_usdt",
+        "bnb_usdt"
+    ],
+    "TIMEFRAMES": [
+        "1min",
+        "5min",
+        "15min",
+        "1h",
+        "4h"
+    ],
+    "WEBSOCKET_TIMEFRAME_CODES": {
+        "1min": "1min",
+        "5min": "5min",
+        "15min": "15min",
+        "1h": "1hr",
+        "4h": "4hr"
+    },
+    "REST_TIMEFRAME_CODES": {
+        "1min": "Minute1",
+        "5min": "minute5",
+        "15min": "minute15",
+        "1h": "hour1",
+        "4h": "hour4"
+    },
+    "TELEGRAM": {
+        "token": "YOUR_TELEGRAM_BOT_TOKEN",
+        "chat_id": "YOUR_TELEGRAM_CHAT_ID"
+    },
+    "TWITTER": {
+        "api_key": "YOUR_TWITTER_API_KEY",
+        "api_secret": "YOUR_TWITTER_API_SECRET",
+        "access_token": "YOUR_TWITTER_ACCESS_TOKEN",
+        "access_secret": "YOUR_TWITTER_ACCESS_SECRET"
+    },
+    "LINKEDIN": {
+        "username": "your_email@example.com",
+        "password": "your_password"
+    }
+}
