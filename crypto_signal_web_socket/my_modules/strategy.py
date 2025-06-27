@@ -114,3 +114,79 @@ class IchimokuDayStrategy:
             return "WaitLLT"
 
         return "Sell"
+
+class TradePlanner:
+    def __init__(self, equity: float, max_risk_pct: float = 2.0, rr_ratio: float = 2.0):
+        self.equity = equity
+        self.max_risk_pct = max_risk_pct
+        self.rr_ratio = rr_ratio
+        self.drawdown_limit_pct = 20.0  # Stop trading if 20% capital lost
+        self.max_drawdown = self.equity * (self.drawdown_limit_pct / 100)
+        self.cumulative_loss = 0.0
+
+    def calculate_trade_levels(self, entry: float, direction: str, atr: float = None, fixed_sl_pct: float = 1.0):
+        """
+        Calculate SL/TP based on entry price and direction.
+        """
+        if atr:
+            sl_distance = atr
+        else:
+            sl_distance = entry * (fixed_sl_pct / 100)
+
+        if direction.lower() == 'long':
+            sl = entry - sl_distance
+            tp = entry + sl_distance * self.rr_ratio
+        else:  # short
+            sl = entry + sl_distance
+            tp = entry - sl_distance * self.rr_ratio
+
+        return round(sl, 6), round(tp, 6)
+
+    def calculate_position_size(self, entry: float, sl: float):
+        """
+        Determine position size based on risk amount.
+        """
+        risk_per_unit = abs(entry - sl)
+        max_risk_amount = self.equity * (self.max_risk_pct / 100)
+
+        if risk_per_unit == 0:
+            return 0  # prevent division by zero
+
+        position_size = max_risk_amount / risk_per_unit
+        return round(position_size, 4)
+
+    def update_drawdown(self, pnl: float):
+        """
+        Update drawdown and check if trading should pause.
+        """
+        if pnl < 0:
+            self.cumulative_loss += abs(pnl)
+
+        if self.cumulative_loss >= self.max_drawdown:
+            print("⚠️ Drawdown limit reached! Stop trading.")
+            return False
+        return True
+
+    def plan_trade(self, signal: dict, atr: float = None):
+        """
+        Given a signal dict, plan the trade with full SL/TP/size details.
+        signal = {
+            'symbol': 'btc_usdt',
+            'entry': 31000,
+            'direction': 'long' or 'short'
+        }
+        """
+        entry = signal['entry']
+        direction = signal['direction']
+        sl, tp = self.calculate_trade_levels(entry, direction, atr)
+        size = self.calculate_position_size(entry, sl)
+
+        return {
+            'symbol': signal['symbol'],
+            'entry': entry,
+            'direction': direction,
+            'sl': sl,
+            'tp': tp,
+            'position_size': size,
+            'rr': self.rr_ratio
+        }
